@@ -101,3 +101,37 @@ jobs:
         with:
           command: test
           args: --features jemalloc
+  
+  build:
+    name: iOS
+    runs-on: macos-12
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: x86_64-apple-ios
+          profile: minimal
+          override: true
+      - name: Install additional targets
+        run: |
+          rustup target add aarch64-apple-ios-sim
+          rustup target add aarch64-apple-ios
+      - name: Build rocksdb for x86_64 iOS simulator
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --target x86_64-apple-ios
+      - name: Build rocksdb for arm64 iOS simulator
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --target aarch64-apple-ios-sim
+      - name: Build rocksdb for arm64 iOS device
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --target aarch64-apple-ios
